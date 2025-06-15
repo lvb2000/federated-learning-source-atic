@@ -198,12 +198,20 @@ class Testing():
         os.system('pkill -9 -f C88A33B946')
         os.system('docker kill $(docker ps -q --filter="name=c88a33b946")')
 
-        for proc in psutil.process_iter():  # for windows users
-            # check whether the process name matches
-            if proc.name() == "python.exe":
-                if "C88A33B946" in proc.cmdline():
-                    logging.info(proc.cmdline())
-                    proc.kill()
+        for proc in psutil.process_iter():
+            try:
+                # check whether the process name matches
+                if proc.name().lower() in ["python.exe", "python", "python3"]:
+                    try:
+                        if "C88A33B946" in proc.cmdline():
+                            logging.info(proc.cmdline())
+                            proc.kill()
+                    except (psutil.ZombieProcess, psutil.NoSuchProcess, psutil.AccessDenied):
+                        # Skip zombie or inaccessible processes
+                        continue
+            except (psutil.ZombieProcess, psutil.NoSuchProcess, psutil.AccessDenied):
+                # Skip zombie or inaccessible processes
+                continue
         time.sleep(3)
 
     # todo start datawrapper if local_data=1
@@ -247,7 +255,7 @@ class Testing():
         log = open("testing/testing.log", 'a+')
         import os
         os.chdir('nodeserver/worker')
-        proc = subprocess.Popen(["docker-compose", '--project-name', f"C88A33B946_{client}", 'up'],
+        proc = subprocess.Popen(["docker", "compose", '--project-name', f"C88A33B946_{client}", 'up'],
                                 env=dict(os.environ, PARTNER_NAME=client,
                                          STATIC_VARIABLES_FILE_PATH="static_variables.json",
                                          PATH_TO_GLOBALSERVER="api/"), )
@@ -299,7 +307,7 @@ class Testing():
         log = open("testing/testing.log", 'a+')
         import os
         os.chdir('globalserver/client_interface_clone')
-        proc = subprocess.Popen(["docker-compose", '--project-name', f"C88A33B946_INTERFACE", 'up'],
+        proc = subprocess.Popen(["docker", "compose", '--project-name', f"C88A33B946_INTERFACE", 'up'],
                                 env=dict(os.environ, PARTNER_NAME="INTERFACE",
                                          CLIENT_INTERFACE_SERVER_ADDRESS="client_interface", SERVER="0",
                                          STATIC_VARIABLES_FILE_PATH="static_variables.json",

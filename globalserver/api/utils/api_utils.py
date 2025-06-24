@@ -129,7 +129,7 @@ def get_clients_response_path(experiment_id, task_id, client):
 def get_db_connection():
     from pymongo import MongoClient
     db_config = json.load(open(config['PATH_TO_GLOBALSERVER'] + config['DB_CONFIG_FILE'], 'r'))
-    client = MongoClient(port=int(db_config['port']), username=db_config['user'], password=db_config['password'])
+    client = MongoClient(host=db_config['host'], port=int(db_config['port']), username=db_config['user'], password=db_config['password'])
     return client.federated_learning, client.start_session
 
 

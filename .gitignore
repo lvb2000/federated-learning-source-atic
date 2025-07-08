@@ -10,3 +10,10 @@ app_data
 globalserver/utils/__pycache__
 nodeserver/worker/utils/__pycache__
 /examples/testing/
+/examples/ATIC_project/.ipynb_checkpoints
+.bash_history
+.cache/matplotlib
+.ipython
+.keras
+.local
+*mongo-keyfile
